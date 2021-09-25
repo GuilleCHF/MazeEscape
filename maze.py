@@ -1,5 +1,5 @@
 import pygame
-import sys
+import time
 from settings import *
 from random import choice
 
@@ -98,7 +98,24 @@ class Maze():
                 self.carve(curr, new)
                 stack.append(curr)
                 stack.append(new)
-
+    
+    def draw(self, screen):
+        tile_size = SCREEN_SIZE // self.maze_size
+        padding = tile_size // 10
+        screen.fill(WALL_COLOR)
+        color = CELL_COLOR
+        for conn in self.conn:
+            i0 = conn[0].i
+            j0 = conn[0].j
+            i1 = conn[1].i
+            j1 = conn[1].j
+            left = min(j0, j1) * tile_size + padding
+            top = min(i0, i1) * tile_size + padding
+            width = (abs(j0 - j1) + 1) * tile_size - 2 * padding
+            height = (abs(i0 - i1) + 1) * tile_size - 2 * padding
+            pygame.draw.rect(screen, color, pygame.Rect(left, top, width, height))
+            # pygame.display.update()
+            # time.sleep(0.02)
 
 
 
