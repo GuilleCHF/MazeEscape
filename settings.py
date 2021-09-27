@@ -1,5 +1,6 @@
 
-
+MAZE_SIZE = 10
+MAZE_SCALE = 2
 SCREEN_SIZE = 600
 WALL_COLOR = "grey50"
 CELL_COLOR = "goldenrod"

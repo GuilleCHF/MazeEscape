@@ -99,11 +99,11 @@ class Maze():
                 stack.append(curr)
                 stack.append(new)
     
-    def draw(self, screen):
-        tile_size = SCREEN_SIZE // self.maze_size
+    def draw(self) -> pygame.Surface:
+        tile_size = (SCREEN_SIZE * MAZE_SCALE) // self.maze_size
         padding = tile_size // 10
-        screen.fill(WALL_COLOR)
-        color = CELL_COLOR
+        my_surf = pygame.Surface((SCREEN_SIZE * MAZE_SCALE, SCREEN_SIZE * MAZE_SCALE))
+        my_surf.fill(WALL_COLOR)
         for conn in self.conn:
             i0 = conn[0].i
             j0 = conn[0].j
@@ -113,9 +113,10 @@ class Maze():
             top = min(i0, i1) * tile_size + padding
             width = (abs(j0 - j1) + 1) * tile_size - 2 * padding
             height = (abs(i0 - i1) + 1) * tile_size - 2 * padding
-            pygame.draw.rect(screen, color, pygame.Rect(left, top, width, height))
-            # pygame.display.update()
-            # time.sleep(0.02)
+            new_surf = pygame.Surface((width, height))
+            new_surf.fill(CELL_COLOR)
+            my_surf.blit(new_surf,(left, top))
+        return my_surf
 
 
 
