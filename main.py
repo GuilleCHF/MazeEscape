@@ -11,7 +11,7 @@ def main():
     pygame.display.set_caption("Maze Escape")
     clock = pygame.time.Clock()
     
-    maze_surf = my_maze.draw()
+    maze_surf = my_maze.draw2()
     # maze_surf_big = pygame.transform.rotozoom(maze_surf,0,2)
     
     # test_timer = pygame.USEREVENT+1
@@ -23,7 +23,6 @@ def main():
     pos_y_map = pos_x_map
     pos_x = SCREEN_SIZE//2
     pos_y = pos_x
-    speed = 2
     
     run = True
     while run:
@@ -38,10 +37,10 @@ def main():
         speed_x = 0
         speed_y = 0
         
-        if up_pressed: speed_y -= speed
-        if down_pressed: speed_y += speed
-        if left_pressed: speed_x -= speed
-        if right_pressed: speed_x += speed
+        if up_pressed: speed_y -= SPEED
+        if down_pressed: speed_y += SPEED
+        if left_pressed: speed_x -= SPEED
+        if right_pressed: speed_x += SPEED
         pos_x_map += speed_x
         pos_y_map += speed_y
         pos_x += speed_x
@@ -51,9 +50,9 @@ def main():
         pos_y = min(pos_y, SCREEN_SIZE// 4 * 3)
         pos_y = max(pos_y, SCREEN_SIZE// 4)
         
-        screen.fill("black")
+        screen.fill(EXT_COLOR)
         screen.blit(maze_surf, (pos_x-pos_x_map, pos_y-pos_y_map))
-        pygame.draw.circle(screen, "red", (pos_x, pos_y), 5)
+        pygame.draw.circle(screen, "red", (pos_x, pos_y), PLAYER_SIZE // 2)
         pygame.display.update()
         clock.tick(60)
     pygame.quit()

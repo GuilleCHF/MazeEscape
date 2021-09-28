@@ -1,3 +1,4 @@
+import random
 import pygame
 import time
 from settings import *
@@ -23,14 +24,73 @@ class Cell():
         self.conn.append(conn)
     
     def __repr__(self) -> str:
-        return f"cell@[{self.i},{self.j}]"
+        return f"C@[{self.i},{self.j}]"
+
+class Wall():
+    _instances= {}
+    def __new__(cls, x1, y1, x2, y2):
+        xx_1 = min(x1, x2)
+        xx_2 = max(x1, x2)
+        yy_1 = min(y1, y2)
+        yy_2 = max(y1, y2)
+        key = (xx_1, yy_1, xx_2, yy_2)
+        if (obj := cls._instances.get(key)) is not None:
+            return obj
+        new = super().__new__(cls)
+        cls._instances[key] = new
+        new.__init(xx_1, yy_1, xx_2, yy_2)
+        return new
+    
+    def __init(self, x1, y1, x2, y2) -> None:
+        self.x1 = x1
+        self.x2 = x2
+        self.y1 = y1
+        self.y2 = y2
+        if self.is_horizontal() and self.is_vertical():
+            raise Exception("Walls must be horizontal or vertical.")
+    
+    def is_vertical(self) ->bool:
+        return self.x1 == self.x2
+    def is_horizontal(self) -> bool:
+        return self.y1 == self.y2
+    
+    def __repr__(self) -> str:
+        return f"W@(x1,y1,x2,y2)={self.x1,self.y1,self.x2,self.y2})"
+    def __eq__(self, o: object) -> bool:
+        return (self.x1 == o.x1) and (self.x2 == o.x2) and (self.y1 == o.y1) and (self.y2 == o.y2)
+
+def get_wall(cell_1: Cell, cell_2: Cell) -> Wall:
+    x1 = min(cell_1.j, cell_2.j)
+    x2 = max(cell_1.j, cell_2.j)
+    y1 = min(cell_1.i, cell_2.i)
+    y2 = max(cell_1.i, cell_2.i)
+    test_list = [abs(x1-x2), abs(y1-y2)]
+    test_list.sort()
+    if test_list != [0, 1]:
+        raise Exception("Cells mus be adjacents to create a wall in between")
+    return Wall(x1+1, y1+1, x2, y2)
 
 class Maze():
     def __init__(self, maze_size) -> None:
+        random.seed(1)
         self.maze_size = maze_size
         self.map = [[Cell(i,j) for j in range(self.maze_size)] for i in range(self.maze_size)]
+        self.walls: list[Wall]
+        self.walls = []
+        self.walls.append(Wall(0, 0, self.maze_size, 0))
+        self.walls.append(Wall(0, 0, 0, self.maze_size))
+        self.walls.append(Wall(self.maze_size, self.maze_size, self.maze_size, 0))
+        self.walls.append(Wall(self.maze_size, self.maze_size, 0, self.maze_size))
+        
+        for i in range(self.maze_size):
+            for j in range(self.maze_size):
+                if j + 1 < self.maze_size:
+                    self.walls.append(get_wall(self.map[i][j],self.map[i][j+1]))
+                if i + 1 < self.maze_size:
+                    self.walls.append(get_wall(self.map[i][j],self.map[i+1][j]))
         self.conn = []
         self.initialize()
+        pass
     
     def get_neighbours(self, curr: Cell) -> list[Cell]:
         curr_x = curr.i
@@ -85,6 +145,8 @@ class Maze():
         origin.add_conn(destiny)
         destiny.add_conn(origin)
         self.conn.append(new_conn)
+        wall = get_wall(origin, destiny)
+        self.walls.remove(wall)
     
     def initialize(self) -> None:
         self.map[0][0].visited = True
@@ -116,6 +178,29 @@ class Maze():
             new_surf = pygame.Surface((width, height))
             new_surf.fill(CELL_COLOR)
             my_surf.blit(new_surf,(left, top))
+        return my_surf
+    
+    def draw2(self) -> pygame.Surface:
+        tile_size = (SCREEN_SIZE * MAZE_SCALE) // self.maze_size
+        padding = tile_size // 10
+        my_surf = pygame.Surface((SCREEN_SIZE * MAZE_SCALE, SCREEN_SIZE * MAZE_SCALE))
+        my_surf.fill(CELL_COLOR)
+        for wall in self.walls:
+            x1 = wall.x1 * tile_size - padding
+            y1 = wall.y1 * tile_size - padding
+            x2 = wall.x2 * tile_size + padding
+            y2 = wall.y2 * tile_size + padding
+            # if wall.is_vertical():
+            #     x1 -= padding
+            #     x2 += padding
+            # else:
+            #     y1 -= padding
+            #     y2 += padding
+            width = x2 - x1
+            height = y2 - y1
+            new_surf = pygame.Surface((width, height))
+            new_surf.fill(WALL_COLOR)
+            my_surf.blit(new_surf,(x1, y1))
         return my_surf
 
 
