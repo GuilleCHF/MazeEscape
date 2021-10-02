@@ -41,6 +41,10 @@ class Wall():
         new.__init(xx_1, yy_1, xx_2, yy_2)
         return new
     
+    # def __init__(self) -> None:
+    #     5
+    #     pass
+
     def __init(self, x1, y1, x2, y2) -> None:
         self.x1 = x1
         self.x2 = x2
@@ -161,41 +165,33 @@ class Maze():
                 stack.append(curr)
                 stack.append(new)
     
-    def draw(self) -> pygame.Surface:
-        tile_size = (SCREEN_SIZE * MAZE_SCALE) // self.maze_size
-        padding = tile_size // 10
-        my_surf = pygame.Surface((SCREEN_SIZE * MAZE_SCALE, SCREEN_SIZE * MAZE_SCALE))
-        my_surf.fill(WALL_COLOR)
-        for conn in self.conn:
-            i0 = conn[0].i
-            j0 = conn[0].j
-            i1 = conn[1].i
-            j1 = conn[1].j
-            left = min(j0, j1) * tile_size + padding
-            top = min(i0, i1) * tile_size + padding
-            width = (abs(j0 - j1) + 1) * tile_size - 2 * padding
-            height = (abs(i0 - i1) + 1) * tile_size - 2 * padding
-            new_surf = pygame.Surface((width, height))
-            new_surf.fill(CELL_COLOR)
-            my_surf.blit(new_surf,(left, top))
-        return my_surf
+    # def _draw_cells(self) -> pygame.Surface:
+    #     tile_size = (SCREEN_SIZE * MAZE_SCALE) // self.maze_size
+    #     padding = tile_size // 10
+    #     my_surf = pygame.Surface((SCREEN_SIZE * MAZE_SCALE, SCREEN_SIZE * MAZE_SCALE))
+    #     my_surf.fill(WALL_COLOR)
+    #     for conn in self.conn:
+    #         i0 = conn[0].i
+    #         j0 = conn[0].j
+    #         i1 = conn[1].i
+    #         j1 = conn[1].j
+    #         left = min(j0, j1) * tile_size + padding
+    #         top = min(i0, i1) * tile_size + padding
+    #         width = (abs(j0 - j1) + 1) * tile_size - 2 * padding
+    #         height = (abs(i0 - i1) + 1) * tile_size - 2 * padding
+    #         new_surf = pygame.Surface((width, height))
+    #         new_surf.fill(CELL_COLOR)
+    #         my_surf.blit(new_surf,(left, top))
+    #     return my_surf
     
-    def draw2(self) -> pygame.Surface:
-        tile_size = (SCREEN_SIZE * MAZE_SCALE) // self.maze_size
-        padding = tile_size // 10
+    def draw(self) -> pygame.Surface:
         my_surf = pygame.Surface((SCREEN_SIZE * MAZE_SCALE, SCREEN_SIZE * MAZE_SCALE))
         my_surf.fill(CELL_COLOR)
         for wall in self.walls:
-            x1 = wall.x1 * tile_size - padding
-            y1 = wall.y1 * tile_size - padding
-            x2 = wall.x2 * tile_size + padding
-            y2 = wall.y2 * tile_size + padding
-            # if wall.is_vertical():
-            #     x1 -= padding
-            #     x2 += padding
-            # else:
-            #     y1 -= padding
-            #     y2 += padding
+            x1 = wall.x1 * TILE_SIZE - PADDING
+            y1 = wall.y1 * TILE_SIZE - PADDING
+            x2 = wall.x2 * TILE_SIZE + PADDING
+            y2 = wall.y2 * TILE_SIZE + PADDING
             width = x2 - x1
             height = y2 - y1
             new_surf = pygame.Surface((width, height))
