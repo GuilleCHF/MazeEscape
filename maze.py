@@ -1,8 +1,8 @@
 import random
 import pygame
-import time
 from settings import *
 from random import choice
+from wall import Wall
 
 
 class Conn():
@@ -12,6 +12,7 @@ class Conn():
     
     def get_els(self) -> list:
         return [self.el1, self.el2]
+
 
 class Cell():
     def __init__(self, i, j) -> None:
@@ -26,44 +27,8 @@ class Cell():
     def __repr__(self) -> str:
         return f"C@[{self.i},{self.j}]"
 
-class Wall():
-    _instances= {}
-    def __new__(cls, x1, y1, x2, y2):
-        xx_1 = min(x1, x2)
-        xx_2 = max(x1, x2)
-        yy_1 = min(y1, y2)
-        yy_2 = max(y1, y2)
-        key = (xx_1, yy_1, xx_2, yy_2)
-        if (obj := cls._instances.get(key)) is not None:
-            return obj
-        new = super().__new__(cls)
-        cls._instances[key] = new
-        new.__init(xx_1, yy_1, xx_2, yy_2)
-        return new
-    
-    # def __init__(self) -> None:
-    #     5
-    #     pass
 
-    def __init(self, x1, y1, x2, y2) -> None:
-        self.x1 = x1
-        self.x2 = x2
-        self.y1 = y1
-        self.y2 = y2
-        if self.is_horizontal() and self.is_vertical():
-            raise Exception("Walls must be horizontal or vertical.")
-    
-    def is_vertical(self) ->bool:
-        return self.x1 == self.x2
-    def is_horizontal(self) -> bool:
-        return self.y1 == self.y2
-    
-    def __repr__(self) -> str:
-        return f"W@(x1,y1,x2,y2)={self.x1,self.y1,self.x2,self.y2})"
-    def __eq__(self, o: object) -> bool:
-        return (self.x1 == o.x1) and (self.x2 == o.x2) and (self.y1 == o.y1) and (self.y2 == o.y2)
-
-def get_wall(cell_1: Cell, cell_2: Cell) -> Wall:
+def get_wall(cell_1: Cell, cell_2: Cell, coords_only = False) -> Wall:
     x1 = min(cell_1.j, cell_2.j)
     x2 = max(cell_1.j, cell_2.j)
     y1 = min(cell_1.i, cell_2.i)
@@ -72,29 +37,51 @@ def get_wall(cell_1: Cell, cell_2: Cell) -> Wall:
     test_list.sort()
     if test_list != [0, 1]:
         raise Exception("Cells mus be adjacents to create a wall in between")
-    return Wall(x1+1, y1+1, x2, y2)
+    xx1 = min(x1 + 1, x2)
+    xx2 = max(x1 + 1, x2)
+    yy1 = min(y1 + 1, y2)
+    yy2 = max(y1 + 1, y2)
+    
+    if coords_only:
+        return (xx1, yy1, xx2, yy2)
+    else:
+        return Wall(xx1, yy1, xx2, yy2)
+
 
 class Maze():
     def __init__(self, maze_size) -> None:
         random.seed(1)
         self.maze_size = maze_size
+        
+        # Cells
         self.map = [[Cell(i,j) for j in range(self.maze_size)] for i in range(self.maze_size)]
-        self.walls: list[Wall]
-        self.walls = []
-        self.walls.append(Wall(0, 0, self.maze_size, 0))
-        self.walls.append(Wall(0, 0, 0, self.maze_size))
-        self.walls.append(Wall(self.maze_size, self.maze_size, self.maze_size, 0))
-        self.walls.append(Wall(self.maze_size, self.maze_size, 0, self.maze_size))
+        
+        # Walls
+        self.walls_dict: dict[tuple, Wall] = {}
+        my_wall = Wall(0, 0, self.maze_size, 0)
+        self.walls_dict [my_wall.get_coords()] = my_wall
+        my_wall = Wall(0, 0, 0, self.maze_size)
+        self.walls_dict [my_wall.get_coords()] = my_wall
+        my_wall = Wall(self.maze_size, self.maze_size, self.maze_size, 0)
+        self.walls_dict [my_wall.get_coords()] = my_wall
+        my_wall = Wall(self.maze_size, self.maze_size, 0, self.maze_size)
+        self.walls_dict [my_wall.get_coords()] = my_wall
         
         for i in range(self.maze_size):
             for j in range(self.maze_size):
                 if j + 1 < self.maze_size:
-                    self.walls.append(get_wall(self.map[i][j],self.map[i][j+1]))
+                    my_wall = get_wall(self.map[i][j],self.map[i][j+1])
+                    self.walls_dict [my_wall.get_coords()] = my_wall
                 if i + 1 < self.maze_size:
-                    self.walls.append(get_wall(self.map[i][j],self.map[i+1][j]))
+                    my_wall = get_wall(self.map[i][j],self.map[i+1][j])
+                    self.walls_dict [my_wall.get_coords()] = my_wall
+        
+        # Initialize Maze
         self.conn = []
         self.initialize()
-        pass
+        self.walls = pygame.sprite.Group()
+        for wall in self.walls_dict.values():
+            self.walls.add(wall)
     
     def get_neighbours(self, curr: Cell) -> list[Cell]:
         curr_x = curr.i
@@ -144,13 +131,12 @@ class Maze():
         return None
     
     def carve(self, origin: Cell, destiny: Cell) -> None:
-        # new_conn = Conn(origin, destiny)
         new_conn = (origin, destiny)
         origin.add_conn(destiny)
         destiny.add_conn(origin)
         self.conn.append(new_conn)
-        wall = get_wall(origin, destiny)
-        self.walls.remove(wall)
+        wall_coords = get_wall(origin, destiny, True)
+        del self.walls_dict[wall_coords]
     
     def initialize(self) -> None:
         self.map[0][0].visited = True
@@ -164,6 +150,30 @@ class Maze():
                 self.carve(curr, new)
                 stack.append(curr)
                 stack.append(new)
+    
+    def walls_group(self) -> pygame.sprite.Group:
+        res = pygame.sprite.Group()
+        for wall in self.walls:
+            res.add(wall)
+        return res
+    
+    # def set_end(self):
+    #     size = TILE_SIZE - WALL_THICKNESS - 2*PLAYER_SIZE
+    #     pos = TILE_SIZE * (MAZE_SIZE-1) + WALL_THICKNESS//2 + PLAYER_SIZE
+    #     # self.end = pygame.Rect(pos, pos, size, size)
+    #     self.end = pygame.sprite.Sprite()
+    #     self.end.image = pygame.Surface((size, size))
+    #     self.end.image.fill("yellow")
+    #     self.end.rect = self.end.image.get_rect(topleft = (pos, pos))
+    
+    # def draw(self, screen):
+    #     self.walls.draw(screen)
+    #     screen.blit(self.end.image, self.end.rect)
+    #     self.end.draw(screen)
+    
+    # def update(self, speed: pygame.math.Vector2) -> None:
+    #     self.walls.update(speed)
+    #     self.end.rect.center += speed
     
     # def _draw_cells(self) -> pygame.Surface:
     #     tile_size = (SCREEN_SIZE * MAZE_SCALE) // self.maze_size
@@ -184,20 +194,23 @@ class Maze():
     #         my_surf.blit(new_surf,(left, top))
     #     return my_surf
     
-    def draw(self) -> pygame.Surface:
-        my_surf = pygame.Surface((SCREEN_SIZE * MAZE_SCALE, SCREEN_SIZE * MAZE_SCALE))
-        my_surf.fill(CELL_COLOR)
-        for wall in self.walls:
-            x1 = wall.x1 * TILE_SIZE - PADDING
-            y1 = wall.y1 * TILE_SIZE - PADDING
-            x2 = wall.x2 * TILE_SIZE + PADDING
-            y2 = wall.y2 * TILE_SIZE + PADDING
-            width = x2 - x1
-            height = y2 - y1
-            new_surf = pygame.Surface((width, height))
-            new_surf.fill(WALL_COLOR)
-            my_surf.blit(new_surf,(x1, y1))
-        return my_surf
+    # def draw(self) -> pygame.Surface:
+    #     my_surf = pygame.Surface((SCREEN_SIZE * MAZE_SCALE, SCREEN_SIZE * MAZE_SCALE))
+    #     my_surf.fill(CELL_COLOR)
+    #     for wall in self.walls_dict.values():
+    #         x1 = wall.x1 * TILE_SIZE - PADDING
+    #         y1 = wall.y1 * TILE_SIZE - PADDING
+    #         x2 = wall.x2 * TILE_SIZE + PADDING
+    #         y2 = wall.y2 * TILE_SIZE + PADDING
+    #         width = x2 - x1
+    #         height = y2 - y1
+    #         new_surf = pygame.Surface((width, height))
+    #         new_surf.fill(WALL_COLOR)
+    #         my_surf.blit(new_surf,(x1, y1))
+    #     return my_surf
+    
+    # def draw_walls(self, screen):
+    #     self.walls.draw(screen)
 
 
 
