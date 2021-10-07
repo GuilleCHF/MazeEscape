@@ -12,7 +12,7 @@ class Wall(pygame.sprite.Sprite):
             raise Exception("Walls must be horizontal or vertical.")
         width = (self.x2 - self.x1) * TILE_SIZE + WALL_THICKNESS
         height = (self.y2 - self.y1) * TILE_SIZE + WALL_THICKNESS
-        pos = (self.x1 * TILE_SIZE - PADDING, self.y1 * TILE_SIZE - PADDING)
+        pos = (self.x1 * TILE_SIZE - WALL_THICKNESS//2, self.y1 * TILE_SIZE - WALL_THICKNESS//2)
         self.image = pygame.Surface((width, height))
         self.image.fill(WALL_COLOR)
         self.rect = self.image.get_rect(topleft = pos)

@@ -27,17 +27,9 @@ class Game():
     
     def run(self):
         self.get_input()
-        
-        self.screen.fill(EXT_COLOR)
-        
         self.update()
-
-        self.field.draw(self.screen)        
-        self.walls.draw(self.screen)
-        self.goal.draw(self.screen)
-        self.player.draw(self.screen)
-        # self.update_pos()
-        # self.draw()
+        self.draw()
+        
     
     def get_input(self):
         key_pressed = pygame.key.get_pressed()
@@ -62,6 +54,7 @@ class Game():
         speed_x = self.speed.x
         speed_y = self.speed.y
 
+        # x movement and collision
         player.update(pygame.math.Vector2(speed_x,0))
         for wall in self.walls:
             if wall.rect.colliderect(player.rect):
@@ -71,6 +64,7 @@ class Game():
                     D_x = wall.rect.right - player.rect.left
                 player.update(pygame.math.Vector2(D_x,0))
         
+        # y movement and collision
         player.update(pygame.math.Vector2(0,speed_y))
         for wall in self.walls:
             if wall.rect.colliderect(player.rect):
@@ -80,6 +74,7 @@ class Game():
                     D_y = wall.rect.bottom - player.rect.top
                 player.update(pygame.math.Vector2(0,D_y))
         
+        # world shift
         if player.rect.centerx > int(SCREEN_SIZE * 3 / 4):
             world_shift_x = int(SCREEN_SIZE * 3 / 4) - player.rect.centerx
         elif player.rect.centerx < int(SCREEN_SIZE / 4):
@@ -103,6 +98,12 @@ class Game():
         self.walls.update(world_shift)
         self.goal.update(world_shift)
     
-    # def draw(self) -> None:
-    #     pass
+    def draw(self) -> None:
+        self.screen.fill(EXT_COLOR)
+
+        self.field.draw(self.screen)        
+        self.walls.draw(self.screen)
+        self.goal.draw(self.screen)
+
+        self.player.draw(self.screen)
     

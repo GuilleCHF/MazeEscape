@@ -50,38 +50,35 @@ def get_wall(cell_1: Cell, cell_2: Cell, coords_only = False) -> Wall:
 
 class Maze():
     def __init__(self, maze_size) -> None:
-        random.seed(1)
+        # random.seed(1)
         self.maze_size = maze_size
         
         # Cells
         self.map = [[Cell(i,j) for j in range(self.maze_size)] for i in range(self.maze_size)]
         
         # Walls
-        self.walls_dict: dict[tuple, Wall] = {}
+        self.walls: dict[tuple, Wall] = {}
         my_wall = Wall(0, 0, self.maze_size, 0)
-        self.walls_dict [my_wall.get_coords()] = my_wall
+        self.walls [my_wall.get_coords()] = my_wall
         my_wall = Wall(0, 0, 0, self.maze_size)
-        self.walls_dict [my_wall.get_coords()] = my_wall
+        self.walls [my_wall.get_coords()] = my_wall
         my_wall = Wall(self.maze_size, self.maze_size, self.maze_size, 0)
-        self.walls_dict [my_wall.get_coords()] = my_wall
+        self.walls [my_wall.get_coords()] = my_wall
         my_wall = Wall(self.maze_size, self.maze_size, 0, self.maze_size)
-        self.walls_dict [my_wall.get_coords()] = my_wall
+        self.walls [my_wall.get_coords()] = my_wall
         
         for i in range(self.maze_size):
             for j in range(self.maze_size):
                 if j + 1 < self.maze_size:
                     my_wall = get_wall(self.map[i][j],self.map[i][j+1])
-                    self.walls_dict [my_wall.get_coords()] = my_wall
+                    self.walls [my_wall.get_coords()] = my_wall
                 if i + 1 < self.maze_size:
                     my_wall = get_wall(self.map[i][j],self.map[i+1][j])
-                    self.walls_dict [my_wall.get_coords()] = my_wall
+                    self.walls [my_wall.get_coords()] = my_wall
         
         # Initialize Maze
         self.conn = []
         self.initialize()
-        self.walls = pygame.sprite.Group()
-        for wall in self.walls_dict.values():
-            self.walls.add(wall)
     
     def get_neighbours(self, curr: Cell) -> list[Cell]:
         curr_x = curr.i
@@ -136,7 +133,7 @@ class Maze():
         destiny.add_conn(origin)
         self.conn.append(new_conn)
         wall_coords = get_wall(origin, destiny, True)
-        del self.walls_dict[wall_coords]
+        del self.walls[wall_coords]
     
     def initialize(self) -> None:
         self.map[0][0].visited = True
@@ -153,65 +150,9 @@ class Maze():
     
     def walls_group(self) -> pygame.sprite.Group:
         res = pygame.sprite.Group()
-        for wall in self.walls:
+        for wall in self.walls.values():
             res.add(wall)
         return res
-    
-    # def set_end(self):
-    #     size = TILE_SIZE - WALL_THICKNESS - 2*PLAYER_SIZE
-    #     pos = TILE_SIZE * (MAZE_SIZE-1) + WALL_THICKNESS//2 + PLAYER_SIZE
-    #     # self.end = pygame.Rect(pos, pos, size, size)
-    #     self.end = pygame.sprite.Sprite()
-    #     self.end.image = pygame.Surface((size, size))
-    #     self.end.image.fill("yellow")
-    #     self.end.rect = self.end.image.get_rect(topleft = (pos, pos))
-    
-    # def draw(self, screen):
-    #     self.walls.draw(screen)
-    #     screen.blit(self.end.image, self.end.rect)
-    #     self.end.draw(screen)
-    
-    # def update(self, speed: pygame.math.Vector2) -> None:
-    #     self.walls.update(speed)
-    #     self.end.rect.center += speed
-    
-    # def _draw_cells(self) -> pygame.Surface:
-    #     tile_size = (SCREEN_SIZE * MAZE_SCALE) // self.maze_size
-    #     padding = tile_size // 10
-    #     my_surf = pygame.Surface((SCREEN_SIZE * MAZE_SCALE, SCREEN_SIZE * MAZE_SCALE))
-    #     my_surf.fill(WALL_COLOR)
-    #     for conn in self.conn:
-    #         i0 = conn[0].i
-    #         j0 = conn[0].j
-    #         i1 = conn[1].i
-    #         j1 = conn[1].j
-    #         left = min(j0, j1) * tile_size + padding
-    #         top = min(i0, i1) * tile_size + padding
-    #         width = (abs(j0 - j1) + 1) * tile_size - 2 * padding
-    #         height = (abs(i0 - i1) + 1) * tile_size - 2 * padding
-    #         new_surf = pygame.Surface((width, height))
-    #         new_surf.fill(CELL_COLOR)
-    #         my_surf.blit(new_surf,(left, top))
-    #     return my_surf
-    
-    # def draw(self) -> pygame.Surface:
-    #     my_surf = pygame.Surface((SCREEN_SIZE * MAZE_SCALE, SCREEN_SIZE * MAZE_SCALE))
-    #     my_surf.fill(CELL_COLOR)
-    #     for wall in self.walls_dict.values():
-    #         x1 = wall.x1 * TILE_SIZE - PADDING
-    #         y1 = wall.y1 * TILE_SIZE - PADDING
-    #         x2 = wall.x2 * TILE_SIZE + PADDING
-    #         y2 = wall.y2 * TILE_SIZE + PADDING
-    #         width = x2 - x1
-    #         height = y2 - y1
-    #         new_surf = pygame.Surface((width, height))
-    #         new_surf.fill(WALL_COLOR)
-    #         my_surf.blit(new_surf,(x1, y1))
-    #     return my_surf
-    
-    # def draw_walls(self, screen):
-    #     self.walls.draw(screen)
-
 
 
 
