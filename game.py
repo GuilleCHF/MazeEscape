@@ -55,6 +55,7 @@ class Game():
         speed_y = self.speed.y
 
         # x movement and collision
+        player.animate(self.speed)
         player.update(pygame.math.Vector2(speed_x,0))
         for wall in self.walls:
             if wall.rect.colliderect(player.rect):
