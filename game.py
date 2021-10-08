@@ -1,9 +1,10 @@
 import pygame
-from pygame import sprite
 from maze import Maze
 from player import Player
 from goal import Goal
 from field import Field
+from enemies import Enemy
+from random import randint
 from settings import *
 
 class Game():
@@ -21,15 +22,29 @@ class Game():
         self.player = pygame.sprite.GroupSingle()
         self.player.add(Player())
         self.speed = pygame.math.Vector2(0,0)
+
+        self.enemies = pygame.sprite.Group()
+        self.enemies.add(Enemy(self.goal.sprite.rect.center))
+        self.enemy_index = 0
+        self.enemy_new = 500
         
         pos = (SCREEN_SIZE - TILE_SIZE) // 2
         self.world_update(pygame.math.Vector2(pos, pos))
     
     def run(self):
         self.get_input()
+        self.enemies_birth()
         self.update()
-        self.draw()
-        
+        self.draw()   
+
+    def enemies_birth(self):
+        self.enemy_index += 1
+        if self.enemy_index == self.enemy_new:
+            delta_x = randint(0,MAZE_SIZE-1)
+            delta_y = randint(0,MAZE_SIZE-1)
+            delta = pygame.math.Vector2(delta_x * TILE_SIZE, delta_y * TILE_SIZE)
+            self.enemy_index = 0
+            self.enemies.add(Enemy(self.goal.sprite.rect.center - delta)) 
     
     def get_input(self):
         key_pressed = pygame.key.get_pressed()
@@ -75,6 +90,11 @@ class Game():
                     D_y = wall.rect.bottom - player.rect.top
                 player.update(pygame.math.Vector2(0,D_y))
         
+        # Enemy
+        for enemy in self.enemies.sprites():
+            enemy.move(self.walls)
+            enemy.animate()
+
         # world shift
         if player.rect.centerx > int(SCREEN_SIZE * 3 / 4):
             world_shift_x = int(SCREEN_SIZE * 3 / 4) - player.rect.centerx
@@ -98,13 +118,16 @@ class Game():
         self.field.update(world_shift)
         self.walls.update(world_shift)
         self.goal.update(world_shift)
+        self.enemies.update(world_shift)
     
     def draw(self) -> None:
-        self.screen.fill(EXT_COLOR)
+        self.screen.fill("black")
 
         self.field.draw(self.screen)        
         self.walls.draw(self.screen)
         self.goal.draw(self.screen)
+
+        self.enemies.draw(self.screen)
 
         self.player.draw(self.screen)
     
