@@ -26,7 +26,7 @@ class Game():
         self.enemies = pygame.sprite.Group()
         self.enemies.add(Enemy(self.goal.sprite.rect.center))
         self.enemy_index = 0
-        self.enemy_new = 500
+        self.enemy_new = ENEMY_RATE
         
         pos = (SCREEN_SIZE - TILE_SIZE) // 2
         self.world_update(pygame.math.Vector2(pos, pos))
@@ -96,6 +96,7 @@ class Game():
             enemy.animate()
 
         # world shift
+        self.goal.sprite.animate()
         if player.rect.centerx > int(SCREEN_SIZE * 3 / 4):
             world_shift_x = int(SCREEN_SIZE * 3 / 4) - player.rect.centerx
         elif player.rect.centerx < int(SCREEN_SIZE / 4):
