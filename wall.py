@@ -1,4 +1,5 @@
 import pygame
+from support import fill_whith_image
 from settings import *
 
 class Wall(pygame.sprite.Sprite):
@@ -14,7 +15,9 @@ class Wall(pygame.sprite.Sprite):
         height = (self.y2 - self.y1) * TILE_SIZE + WALL_THICKNESS
         pos = (self.x1 * TILE_SIZE - WALL_THICKNESS//2, self.y1 * TILE_SIZE - WALL_THICKNESS//2)
         self.image = pygame.Surface((width, height))
-        self.image.fill(WALL_COLOR)
+        image = pygame.image.load(WALL_IMAGE)
+        fill_whith_image(self.image, image)
+        # self.image.fill(WALL_COLOR)
         self.rect = self.image.get_rect(topleft = pos)
     
     def update(self, speed: pygame.math.Vector2):
