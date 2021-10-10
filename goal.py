@@ -6,7 +6,7 @@ from settings import *
 class Goal(pygame.sprite.Sprite):
     def __init__(self) -> None:
         super().__init__()
-        self.frames = get_frames("images\\goal")
+        self.frames = get_frames(Path(r"./images/goal"))
         self.frame_index = 0
         self.animation_speed = .15
         pos = TILE_SIZE * MAZE_SIZE - TILE_SIZE // 2 

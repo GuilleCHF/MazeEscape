@@ -6,7 +6,8 @@ def get_frames(path) -> list[pygame.Surface]:
     frames = []
     for _, __, files in walk(path):
         for file in files:
-            image = pygame.image.load(path +"\\" + file).convert_alpha()
+            file_path = path / file
+            image = pygame.image.load(file_path).convert_alpha()
             image = pygame.transform.scale2x(image)
             frames.append(image)
     return frames
