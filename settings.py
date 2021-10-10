@@ -1,3 +1,4 @@
+from pathlib import Path
 
 SCREEN_SIZE = 700
 MAZE_SIZE = 10
@@ -13,7 +14,7 @@ ENEMY_RATE = 100
 # CELL_COLOR = "goldenrod"
 # EXT_COLOR = "darkgreen"
 
-ENEMIES_PATH = ["images\\enemies\\1", "images\\enemies\\2"] 
-WALL_IMAGE = "images\\maze\\wall4.png"
-FLOOR_IMAGE = "images\\maze\\floor4.png"
-OUTSIDE_IMAGE = "images\\maze\\outside2.png"
+ENEMIES_PATH = [Path(r"./images/enemies/1"), Path(r"./images/enemies/2")] 
+WALL_IMAGE = Path(r"./images/maze/wall4.png")
+FLOOR_IMAGE = Path(r"./images/maze/floor4.png")
+OUTSIDE_IMAGE = Path(r"./images/maze/outside2.png")
