@@ -1,6 +1,7 @@
 import pygame
 from settings import *
 from game import Game
+from title import Title
 
 def main():
     pygame.init()
@@ -9,6 +10,8 @@ def main():
     clock = pygame.time.Clock()
     
     my_game = Game(screen)
+    my_title = Title(screen)
+    game_running = False
     
     run = True
     while run:
@@ -16,7 +19,10 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
         
-        my_game.run()
+        if game_running:
+            game_running = my_game.run()
+        else:
+            game_running = my_title.run()
         
         pygame.display.update()
         clock.tick(60)

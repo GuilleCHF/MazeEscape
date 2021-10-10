@@ -36,6 +36,7 @@ class Game():
         self.enemies_birth()
         self.update()
         self.draw()   
+        return True
 
     def enemies_birth(self):
         self.enemy_index += 1
