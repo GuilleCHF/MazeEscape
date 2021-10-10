@@ -35,8 +35,25 @@ class Game():
         self.get_input()
         self.enemies_birth()
         self.update()
-        self.draw()   
-        return True
+        self.draw()
+        if self.enemy_collision():
+            return "title"
+        elif self.goal_collision():
+            return "title"
+        else:   
+            return "run"
+
+    def enemy_collision(self) -> bool:
+        for enemy in self.enemies:
+            if enemy.rect.colliderect(self.player.sprite.rect):
+                return True
+        return False
+    
+    def goal_collision(self) -> bool:
+        if self.goal.sprite.rect.colliderect(self.player.sprite.rect):
+            return True
+        else:
+            return False
 
     def enemies_birth(self):
         self.enemy_index += 1
