@@ -1,6 +1,6 @@
 
 SCREEN_SIZE = 700
-MAZE_SIZE = 3
+MAZE_SIZE = 10
 TILE_SIZE = 384
 WALL_THICKNESS = 64
 SPEED = 3
@@ -14,6 +14,6 @@ ENEMY_RATE = 100
 # EXT_COLOR = "darkgreen"
 
 ENEMIES_PATH = ["images\\enemies\\1", "images\\enemies\\2"] 
-WALL_IMAGE = "images\\maze\\wall4.png"
-FLOOR_IMAGE = "images\\maze\\floor4.png"
-OUTSIDE_IMAGE = "images\\maze\\outside2.png"
+WALL_IMAGE = "images\\maze\\wall5.png"
+FLOOR_IMAGE = "images\\maze\\floor5.png"
+OUTSIDE_IMAGE = "images\\maze\\outside3.png"

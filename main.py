@@ -26,7 +26,15 @@ def main():
         elif game_status == "new game":
             my_game = Game(screen)
             game_status = "run"
-        
+        elif game_status == "win":
+            my_title.lose = False
+            my_title.win = True
+            game_status = "title"
+        elif game_status == "lose":
+            my_title.lose = True
+            my_title.win = False
+            game_status = "title"
+
         pygame.display.update()
         clock.tick(60)
     pygame.quit()

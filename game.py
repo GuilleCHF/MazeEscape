@@ -37,9 +37,9 @@ class Game():
         self.update()
         self.draw()
         if self.enemy_collision():
-            return "title"
+            return "lose"
         elif self.goal_collision():
-            return "title"
+            return "win"
         else:   
             return "run"
 
