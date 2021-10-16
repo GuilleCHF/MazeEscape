@@ -1,4 +1,4 @@
-from os import truncate
+from os import path
 import pygame
 from settings import *
 from support import get_frames
@@ -7,8 +7,8 @@ from support import get_frames
 class Player(pygame.sprite.Sprite):
     def __init__(self) -> None:
         super().__init__()
-        self.walk_frames = get_frames("images\\player\\walk")
-        self.stand_frames = get_frames("images\\player\\stand")
+        self.walk_frames = get_frames(path.join("images","player","walk"))
+        self.stand_frames = get_frames(path.join("images","player","stand"))
         self.frames = self.stand_frames
         self.frame_index = 0
         self.animation_speed = 0.2
