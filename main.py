@@ -11,7 +11,7 @@ def main():
     
     my_game = None
     my_title = Title(screen)
-    game_status = "title"
+    game_status = GameStatus.TITLE
     
     run = True
     while run:
@@ -19,21 +19,21 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
         
-        if game_status == "run":
+        if game_status == GameStatus.RUN:
             game_status = my_game.run()
-        elif game_status == "title":
+        elif game_status == GameStatus.TITLE:
             game_status = my_title.run()
-        elif game_status == "new game":
+        elif game_status == GameStatus.NEW_GAME:
             my_game = Game(screen)
-            game_status = "run"
-        elif game_status == "win":
+            game_status = GameStatus.RUN
+        elif game_status == GameStatus.WIN:
             my_title.lose = False
             my_title.win = True
-            game_status = "title"
-        elif game_status == "lose":
+            game_status = GameStatus.TITLE
+        elif game_status == GameStatus.LOSE:
             my_title.lose = True
             my_title.win = False
-            game_status = "title"
+            game_status = GameStatus.TITLE
 
         pygame.display.update()
         clock.tick(60)

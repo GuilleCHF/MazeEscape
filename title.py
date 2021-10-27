@@ -46,6 +46,6 @@ class Title():
         self.draw()
         keys = pygame.key.get_pressed()
         if keys[K_SPACE]:
-            return "new game"
+            return GameStatus.NEW_GAME
         else:
-            return "title"
+            return GameStatus.TITLE
